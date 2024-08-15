@@ -1,0 +1,8 @@
+services:
+  captioner:
+    build:
+      context: .
+    ports:
+      - 8000:8000
+    environment:
+      IMAGE_SIZE: 256
