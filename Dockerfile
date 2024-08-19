@@ -9,5 +9,6 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+RUN python3 cache_models.py
 
 CMD ["uvicorn", "--host", "0.0.0.0", "--port", "8000", "main:app"]
