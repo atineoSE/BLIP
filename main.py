@@ -11,7 +11,6 @@ from fastapi.responses import JSONResponse
 from PIL import Image
 
 from api.captioner import Captioner
-from api.prompts import style_question
 from api.questioner import Questioner
 
 logging.basicConfig(
@@ -41,7 +40,7 @@ app = FastAPI(title="BLIP", description="BLIP for image captioning", lifespan=li
 async def get_caption(request: Request, image: UploadFile) -> JSONResponse:
     contents = await image.read()
     input_image = Image.open(io.BytesIO(contents))
-    caption = request.app.captioner.get_caption(input_image)
+    caption = request.app.captioner.get_caption(input_image)[0]
     return JSONResponse(caption)
 
 
@@ -51,7 +50,7 @@ async def get_answer(
 ) -> JSONResponse:
     contents = await image.read()
     input_image = Image.open(io.BytesIO(contents))
-    answer = request.app.questioner.get_answer(input_image, question)
+    answer = request.app.questioner.get_answer(input_image, question)[0]
     return JSONResponse(answer)
 
 
@@ -60,10 +59,10 @@ async def get_rich_caption(request: Request, image: UploadFile) -> JSONResponse:
     contents = await image.read()
     input_image = Image.open(io.BytesIO(contents))
     caption = request.app.captioner.get_caption(input_image)
-    logging.debug(f"Got caption: {caption}")
-    style = request.app.questioner.get_answer(input_image, style_question)
-    logging.debug(f"Got style: {style}")
-    rich_caption = ", ".join(caption + style)
+    additional_description = request.app.questioner.get_additional_description(
+        input_image
+    )
+    rich_caption = caption[0] + additional_description
     return JSONResponse(rich_caption)
 
 
