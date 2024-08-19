@@ -60,8 +60,10 @@ async def get_rich_caption(request: Request, image: UploadFile) -> JSONResponse:
     contents = await image.read()
     input_image = Image.open(io.BytesIO(contents))
     caption = request.app.captioner.get_caption(input_image)
+    logging.debug(f"Got caption: {caption}")
     style = request.app.questioner.get_answer(input_image, style_question)
-    rich_caption = caption + ", " + style
+    logging.debug(f"Got style: {style}")
+    rich_caption = ", ".join(caption + style)
     return JSONResponse(rich_caption)
 
 
